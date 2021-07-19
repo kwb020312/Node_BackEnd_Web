@@ -4,6 +4,7 @@ const app = express();
 app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.set("view engine", "ejs");
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/public/main.html");
@@ -14,7 +15,7 @@ app.get("/main", (req, res) => {
 });
 
 app.post("/email_post", (req, res) => {
-  res.send(`<h1>Welcome, ${req.body.email}</h1>`);
+  res.render("email.ejs", { email: req.body.email });
 });
 
 app.listen(3000, () => {
