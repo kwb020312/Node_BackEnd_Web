@@ -3,6 +3,7 @@ const router = express.Router();
 const path = require("path");
 const main = require("./main/main");
 const email = require("./email/email");
+const join = require("./join/index");
 
 router.get("/", (req, res) => {
   console.log("main js loaded");
@@ -11,5 +12,6 @@ router.get("/", (req, res) => {
 
 router.use("/main", main);
 router.use("/email", email);
+router.use("/join", join);
 
 module.exports = router;
