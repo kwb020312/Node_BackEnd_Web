@@ -32,6 +32,15 @@ passport.use(
   )
 );
 
+router.post(
+  "/",
+  passport.authenticate("local-join", {
+    successRedirect: "/main",
+    failureRedirect: "/join",
+    failureFlash: true,
+  })
+);
+
 // router.post("/", (req, res) => {
 //   const body = req.body;
 //   const { email, name, password } = body;
