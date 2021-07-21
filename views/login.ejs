@@ -30,8 +30,15 @@
             xhr.addEventListener('load', () => {
                const result = JSON.parse(xhr.responseText)
                const resultDiv = document.querySelector('.result')
-               if(result.email) resultDiv.innerHTML = `Welcome, ${result.email} !!`
-               else resultDiv.innerHTML = result
+               if(result.email) {
+                   window.location.href="/main"
+                    // resultDiv.innerHTML = `Welcome, ${result.email} !!`
+               } else if(xhr.status === 401) {
+                   resultDiv.innerHTML = result+ '<div><a href="/join">Sign Up!</a></div>'
+               } else {
+                    resultDiv.innerHTML = result
+               }
+               
             })
         }
     </script>
