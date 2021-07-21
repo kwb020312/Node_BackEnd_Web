@@ -14,20 +14,18 @@ const connection = mysql.createConnection({
 connection.connect();
 
 router.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../../public/join.html"));
+  res.render("join.ejs");
 });
 
 router.post("/", (req, res) => {
   const body = req.body;
   const { email, name, password } = body;
 
-  const query = connection.query(
-    `insert into user (email,name,pw) values("${email}", "${name}","${password}");`,
-    (err, rows) => {
-      if (err) throw err;
-      console.log("ok db insert");
-    }
-  );
+  const sql = { email: email, name: name, pw: password };
+  const query = connection.query("insert into user set ?", sql, (err, rows) => {
+    if (err) throw err;
+    res.render("welcome.ejs", { email: email, id: rows.insertId });
+  });
 });
 
 module.exports = router;
