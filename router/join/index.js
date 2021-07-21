@@ -3,6 +3,7 @@ const router = express.Router();
 const mysql = require("mysql");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
+const flash = require("connect-flash");
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -15,8 +16,13 @@ const connection = mysql.createConnection({
 connection.connect();
 
 router.get("/", (req, res) => {
-  res.render("join.ejs");
+  let msg;
+  const errMsg = req.flash("error");
+  if (errMsg) msg = errMsg;
+  res.render("join.ejs", { message: msg });
 });
+
+// passport.serializeUser
 
 passport.use(
   "local-join",
@@ -27,7 +33,31 @@ passport.use(
       passReqToCallback: true,
     },
     (req, email, password, done) => {
-      console.log("local-join callback called");
+      console.log(email, password);
+      const query = connection.query(
+        `select * from user where email=?`,
+        [email],
+        (err, rows) => {
+          if (err) return done(err);
+
+          if (rows.length) {
+            console.log("existed user");
+            return done(null, false, {
+              message: "your email is aleready used!",
+            });
+          } else {
+            const sql = { email: email, pw: password };
+            const query = connection.query(
+              `insert into user set ?`,
+              sql,
+              (err, rows) => {
+                if (err) throw err;
+                return done(null, { email: email, id: rows.insertId });
+              }
+            );
+          }
+        }
+      );
     }
   )
 );
