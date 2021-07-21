@@ -19,7 +19,7 @@ router.get("/", (req, res) => {
   let msg;
   const errMsg = req.flash("error");
   if (errMsg) msg = errMsg;
-  res.render("login.ejs", { message: msg });
+  res.render("login.ejs");
 });
 
 passport.serializeUser((user, done) => {
@@ -37,7 +37,7 @@ passport.use(
   new LocalStrategy(
     {
       usernameField: "email",
-      passwordField: "passwd",
+      passwordField: "password",
       passReqToCallback: true,
     },
     (req, email, password, done) => {
@@ -49,20 +49,11 @@ passport.use(
           if (err) return done(err);
 
           if (rows.length) {
-            console.log("existed user");
-            return done(null, false, {
-              message: "your email is aleready used!",
-            });
+            return done(null, { email: email, id: rows[0].UID });
           } else {
-            const sql = { email: email, pw: password };
-            const query = connection.query(
-              `insert into user set ?`,
-              sql,
-              (err, rows) => {
-                if (err) throw err;
-                return done(null, { email: email, id: rows.insertId });
-              }
-            );
+            return done(null, false, {
+              message: "your Login info is not found >.<",
+            });
           }
         }
       );
@@ -70,24 +61,16 @@ passport.use(
   )
 );
 
-router.post(
-  "/",
-  passport.authenticate("local-join", {
-    successRedirect: "/main",
-    failureRedirect: "/join",
-    failureFlash: true,
-  })
-);
+router.post("/", (req, res, next) => {
+  passport.authenticate("local-login", (err, user, info) => {
+    if (err) res.status(500).json(err);
+    if (!user) return res.status(401).json(info.message);
 
-// router.post("/", (req, res) => {
-//   const body = req.body;
-//   const { email, name, password } = body;
-
-//   const sql = { email: email, name: name, pw: password };
-//   const query = connection.query("insert into user set ?", sql, (err, rows) => {
-//     if (err) throw err;
-//     res.render("welcome.ejs", { email: email, id: rows.insertId });
-//   });
-// });
+    req.logIn(user, (err) => {
+      if (err) return next(err);
+      return res.json(user);
+    });
+  })(req, res, next);
+});
 
 module.exports = router;

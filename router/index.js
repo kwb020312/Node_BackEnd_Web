@@ -4,7 +4,7 @@ const path = require("path");
 const main = require("./main/main");
 const email = require("./email/email");
 const join = require("./join/index");
-const login = require("./join/index");
+const login = require("./login/index");
 
 router.get("/", (req, res) => {
   console.log("main js loaded");

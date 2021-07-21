@@ -4,26 +4,23 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>email form</title>
+    <title>Login</title>
 </head>
 <body>
-    <form action="/email_form" method="POST">
-        email : <input type="text" name="email">
-        <br/>
-        <input type="password" name="password">
-        <br/>
-        <input type="submit">
-        <p class="result"></p>
+    <form action="/login" method="POST">
+        email : <input type="text" name="email"><br/>
+        password : <input type="password" name="password"><br/>
     </form>
-    <button class="ajaxsend">ajaxsend</button>
+    <button class="ajaxsend">Login</button>
+    <p class="result"></p>
     <script>
         document.querySelector('.ajaxsend').addEventListener('click',() => {
             const email = document.getElementsByName('email')[0].value
             const password = document.getElementsByName('password')[0].value
-            sendAjax('http://localhost:3000/email/ajax', {'email' : email, 'password' : password})
+            sendAjax('http://localhost:3000/login', {'email' : email, 'password' : password})
         })
 
-        const sendAjax = (url,inf) => {
+        const sendAjax = (url,data) => {
             data = JSON.stringify(data)
             const xhr = new XMLHttpRequest()
             xhr.open('POST',url)
@@ -33,8 +30,8 @@
             xhr.addEventListener('load', () => {
                const result = JSON.parse(xhr.responseText)
                const resultDiv = document.querySelector('.result')
-               if(result.result !== 'ok') resultDiv.innerHTML = `your email in not found`
-               else resultDiv.innerHTML = result.name
+               if(result.email) resultDiv.innerHTML = `Welcome, ${result.email} !!`
+               else resultDiv.innerHTML = result
             })
         }
     </script>
