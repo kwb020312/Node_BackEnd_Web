@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const path = require("path");
 const mysql = require("mysql");
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -17,15 +18,29 @@ router.get("/", (req, res) => {
   res.render("join.ejs");
 });
 
-router.post("/", (req, res) => {
-  const body = req.body;
-  const { email, name, password } = body;
+passport.use(
+  "local-join",
+  new LocalStrategy(
+    {
+      usernameField: "email",
+      passwordField: "passwd",
+      passReqToCallback: true,
+    },
+    (req, email, password, done) => {
+      console.log("local-join callback called");
+    }
+  )
+);
 
-  const sql = { email: email, name: name, pw: password };
-  const query = connection.query("insert into user set ?", sql, (err, rows) => {
-    if (err) throw err;
-    res.render("welcome.ejs", { email: email, id: rows.insertId });
-  });
-});
+// router.post("/", (req, res) => {
+//   const body = req.body;
+//   const { email, name, password } = body;
+
+//   const sql = { email: email, name: name, pw: password };
+//   const query = connection.query("insert into user set ?", sql, (err, rows) => {
+//     if (err) throw err;
+//     res.render("welcome.ejs", { email: email, id: rows.insertId });
+//   });
+// });
 
 module.exports = router;
