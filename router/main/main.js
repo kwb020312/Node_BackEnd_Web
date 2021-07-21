@@ -4,7 +4,8 @@ const path = require("path");
 
 router.get("/", (req, res) => {
   console.log("main js loaded");
-  res.sendFile(path.join(__dirname, "../public/main.html"));
+  const id = req.user;
+  res.render("main.ejs", { id: id });
 });
 
 module.exports = router;
